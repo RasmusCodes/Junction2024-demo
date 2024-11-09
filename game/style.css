@@ -16,7 +16,7 @@ body {
 
 .container {
   position: relative;
-  margin-bottom: 10% !important;
+  margin-bottom: 7% !important;
 }
 
 .road {
@@ -148,4 +148,19 @@ body {
   height: 40px;
   top: -40px; /* Starts just off-screen */
   border-radius: 5px;
+}
+
+#toggleLabel {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+#toggleCheckbox {
+  margin-right: 5px;
 }

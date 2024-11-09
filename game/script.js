@@ -10,7 +10,16 @@ const roadWidth = 300;
 const scooterWidth = 60;
 let obstacles = [];
 let obstacleSpeed = speed / 10; // Speed of obstacle movement downwards
-const deceleration = -5; // Constant deceleration (e.g., -5 m/s²)
+let deceleration = 0.4 * speed; // Constant deceleration (e.g., -5 m/s²)
+
+let scootaware = false; // Initial state of scootaware
+let manslaughterCount = 0; // Counter for the number of incidents
+
+// Toggle scootaware when checkbox is clicked
+document.getElementById('toggleCheckbox').onchange = function () {
+    scootaware = this.checked;
+    console.log(`Scootaware is now ${scootaware ? 'ON' : 'OFF'}`);
+};
 
 // Function to calculate dynamic braking distance based on current speed
 // Function to calculate dynamic braking distance based on current speed
@@ -53,20 +62,29 @@ function detectObstacle() {
     const scooterRect = scooter.getBoundingClientRect();
     let brakingDistance = 10 * calculateBrakingDistance(speed); // Get braking distance based on current speed
     console.log(`Braking Distance: ${brakingDistance}`); // Debug log
-
     obstacles.forEach((obstacle) => {
         const obstacleRect = obstacle.getBoundingClientRect();
         const distance = scooterRect.top - obstacleRect.bottom;
-        console.log(`Obstacle Distance: ${distance}`); // Debug log
+        // Detect collision if the obstacle touches the scooter
+        if (
+          obstacleRect.bottom >= scooterRect.top &&
+          obstacleRect.top <= scooterRect.bottom &&
+          Math.abs(scooterRect.left - obstacleRect.left) < scooterWidth
+      ) {
+          manslaughterCount++;
+          alert(`You killed a pedestrian!\nVehicular manslaughter count: ${manslaughterCount}`);
+          obstacle.remove();
+      }
 
         // Start braking when within a certain percentage of brakingDistance
-        const brakeThreshold = 0.6; // Start braking when obstacle is 80% of the braking distance
+        const brakeThreshold = 0.8; // Start braking when obstacle is 80% of the braking distance
         if (
+            scootaware && 
             distance < brakingDistance * brakeThreshold && // Adjust threshold for when to start braking
             Math.abs(scooterRect.left - obstacleRect.left) < scooterWidth
         ) {
             console.log('Braking triggered'); // Debug log
-            if (speed > 0) speed *= 0.4; // Gradually reduce speed (adjust as needed)
+            if (speed > 0) speed -= deceleration; // Gradually reduce speed (adjust as needed)
             if (speed < 0) speed = 0;
         }
     });
@@ -106,20 +124,22 @@ document.addEventListener('keydown', (e) => {
   switch (e.key) {
     case 'ArrowUp':
       if (speed < maxSpeed) speed += 1;
+      deceleration = speed*0.4;
       break;
     case 'ArrowDown':
-      if (speed > 0) speed -= 1;
+      if (speed > 0) speed -= deceleration/3;
+      deceleration = speed*0.4;
       break;
     case 'ArrowLeft':
       if (scooterX > -((roadWidth - scooterWidth) / 2)) {
         scooterX -= 5;
-        scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) rotate(-15deg)`;
+        scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) `;
       }
       break;
     case 'ArrowRight':
       if (scooterX < (roadWidth - scooterWidth) / 2) {
         scooterX += 5;
-        scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) rotate(15deg)`;
+        scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) `;
       }
       break;
   }
@@ -144,7 +164,7 @@ function gameLoop() {
   updateRoadSpeed();
   updateSpeedometer();
   speedDisplay.textContent = Math.round(speed);
-
+  
   requestAnimationFrame(gameLoop);
 }
 
