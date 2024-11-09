@@ -56,18 +56,18 @@ function detectObstacle() {
 
     obstacles.forEach((obstacle) => {
         const obstacleRect = obstacle.getBoundingClientRect();
-        const distance = Math.abs(obstacleRect.top - scooterRect.bottom);
+        const distance = scooterRect.top - obstacleRect.bottom;
         console.log(`Obstacle Distance: ${distance}`); // Debug log
 
         // Start braking when within a certain percentage of brakingDistance
-        const brakeThreshold = 0.8; // Start braking when obstacle is 80% of the braking distance
+        const brakeThreshold = 0.6; // Start braking when obstacle is 80% of the braking distance
         if (
             distance < brakingDistance * brakeThreshold && // Adjust threshold for when to start braking
             Math.abs(scooterRect.left - obstacleRect.left) < scooterWidth
         ) {
             console.log('Braking triggered'); // Debug log
-            if (speed > 0) speed -= 0.2 * speed; // Gradually reduce speed (adjust as needed)
-            if (speed < 3) speed = 3; // Prevent speed from going below a certain threshold
+            if (speed > 0) speed *= 0.4; // Gradually reduce speed (adjust as needed)
+            if (speed < 0) speed = 0;
         }
     });
 }
@@ -81,7 +81,7 @@ function updateRoadSpeed() {
   const elapsedRatio = elapsed_time / animDuration;
   animDuration = 2 / (speed / 10);
 
-  obstacleSpeed = speed * 0.7;
+  obstacleSpeed = speed * 0.8;
   
   roads.forEach((road) => {
     if (speed > 0) {
