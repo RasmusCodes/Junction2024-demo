@@ -141,14 +141,57 @@ body {
   }
 }
 
+/* Main body (torso) */
 .obstacle {
-  position: absolute;
-  background-color: red;
-  width: 40px;
-  height: 40px;
-  top: -40px; /* Starts just off-screen */
-  border-radius: 5px;
+  width: 8px; /* Width of the torso */
+  height: 20px; /* Height of the torso */
+  background-color: black;
+  border-radius: 4px;
 }
+
+/* Head */
+.obstacle .head {
+  position: absolute;
+  top: -14px; /* Position above the body */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+/* Arms */
+.obstacle .arms {
+  position: absolute;
+  top: 4px; /* Position near the top of the torso */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px; /* Length of the arms */
+  height: 2px;
+  background-color: black;
+}
+
+/* Legs */
+.obstacle .leg-left, .obstacle .leg-right {
+  position: absolute;
+  bottom: -14px; /* Position below the torso */
+  width: 2px;
+  height: 14px;
+  background-color: black;
+}
+
+.obstacle .leg-left {
+  left: -5px;
+  transform: rotate(15deg); /* Angle for the left leg */
+}
+
+.obstacle .leg-right {
+  right: -5px;
+  transform: rotate(-15deg); /* Angle for the right leg */
+}
+
+
 
 #toggleLabel {
   position: fixed;

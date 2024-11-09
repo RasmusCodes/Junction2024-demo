@@ -17,8 +17,7 @@ let manslaughterCount = 0; // Counter for the number of incidents
 
 // Toggle scootaware when checkbox is clicked
 document.getElementById('toggleCheckbox').onchange = function () {
-    scootaware = this.checked;
-    console.log(`Scootaware is now ${scootaware ? 'ON' : 'OFF'}`);
+    scootaware = this.checked;    
 };
 
 // Function to calculate dynamic braking distance based on current speed
@@ -32,15 +31,35 @@ function calculateBrakingDistance(speed) {
 function createObstacle() {
   const obstacle = document.createElement('div');
   obstacle.classList.add('obstacle');
-  obstacle.style.width = '40px';
-  obstacle.style.height = '40px';
-  obstacle.style.backgroundColor = 'red';
+  
+  // Set the main obstacle body properties
   obstacle.style.position = 'absolute';
   obstacle.style.top = '-40px';
   obstacle.style.left = `${Math.random() * (roadWidth - 40)}px`;
+  
+  // Add head
+  const head = document.createElement('div');
+  head.classList.add('head');
+  obstacle.appendChild(head);
+
+  // Add arms
+  const arms = document.createElement('div');
+  arms.classList.add('arms');
+  obstacle.appendChild(arms);
+
+  // Add legs
+  const legLeft = document.createElement('div');
+  legLeft.classList.add('leg-left');
+  obstacle.appendChild(legLeft);
+
+  const legRight = document.createElement('div');
+  legRight.classList.add('leg-right');
+  obstacle.appendChild(legRight);
+
   document.querySelector('.road').appendChild(obstacle);
   obstacles.push(obstacle);
 }
+
 
 // Function to move obstacles down the road
 function moveObstacles() {
@@ -61,7 +80,6 @@ function moveObstacles() {
 function detectObstacle() {
     const scooterRect = scooter.getBoundingClientRect();
     let brakingDistance = 10 * calculateBrakingDistance(speed); // Get braking distance based on current speed
-    console.log(`Braking Distance: ${brakingDistance}`); // Debug log
     obstacles.forEach((obstacle) => {
         const obstacleRect = obstacle.getBoundingClientRect();
         const distance = scooterRect.top - obstacleRect.bottom;
@@ -69,7 +87,7 @@ function detectObstacle() {
         if (
           obstacleRect.bottom >= scooterRect.top &&
           obstacleRect.top <= scooterRect.bottom &&
-          Math.abs(scooterRect.left - obstacleRect.left) < scooterWidth
+          (Math.abs(scooterRect.left - obstacleRect.left) < 20 || Math.abs(scooterRect.right - obstacleRect.right) < 20)
       ) {
           manslaughterCount++;
           alert(`You killed a pedestrian!\nVehicular manslaughter count: ${manslaughterCount}`);
@@ -83,7 +101,6 @@ function detectObstacle() {
             distance < brakingDistance * brakeThreshold && // Adjust threshold for when to start braking
             Math.abs(scooterRect.left - obstacleRect.left) < scooterWidth
         ) {
-            console.log('Braking triggered'); // Debug log
             if (speed > 0) speed -= deceleration; // Gradually reduce speed (adjust as needed)
             if (speed < 0) speed = 0;
         }
@@ -123,20 +140,28 @@ function updateSpeedometer() {
 document.addEventListener('keydown', (e) => {
   switch (e.key) {
     case 'ArrowUp':
+      if (speed < 0) speed = 0;
       if (speed < maxSpeed) speed += 1;
+      if (speed > maxSpeed) speed = 20;
       deceleration = speed*0.4;
       break;
     case 'ArrowDown':
       if (speed > 0) speed -= deceleration/3;
+      if (speed < 0) speed = 0; 
+      if (speed > maxSpeed) speed = 20;
       deceleration = speed*0.4;
       break;
     case 'ArrowLeft':
+      if (speed < 0) speed = 0;
+      if (speed > maxSpeed) speed = 20;
       if (scooterX > -((roadWidth - scooterWidth) / 2)) {
         scooterX -= 5;
         scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) `;
       }
       break;
     case 'ArrowRight':
+      if (speed < 0) speed = 0;
+      if (speed > maxSpeed) speed = 20;
       if (scooterX < (roadWidth - scooterWidth) / 2) {
         scooterX += 5;
         scooter.style.transform = `translateX(calc(-50% + ${scooterX}px)) `;
